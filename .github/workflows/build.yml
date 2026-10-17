@@ -1,0 +1,37 @@
+name: Build Baritone-X
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          repository: Nevarielle/baritone-1.21.11
+          ref: update/1.21.11-fabric
+          path: source
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Build mod
+        working-directory: source
+        run: |
+          chmod +x gradlew
+          ./gradlew :fabric:remapJar --no-daemon
+
+      - name: Upload JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: Baritone-X
+          path: source/**/build/libs/*.jar
+          if-no-files-found: error
